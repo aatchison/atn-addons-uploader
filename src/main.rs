@@ -197,7 +197,44 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let status = resp.status();
     let body = resp.text().unwrap_or_default();
-    println!("{} {}", status.as_u16(), body);
-
+    print_upload_result(status.as_u16(), &body);
     Ok(())
+
+/// Print upload result and success message if appropriate
+fn print_upload_result(status: u16, body: &str) {
+    println!("{} {}", status, body);
+    if (200..300).contains(&status) {
+        println!("Upload successful!");
+    }
+}
+    #[test]
+    fn test_print_upload_result_success() {
+        use std::io::Cursor;
+        use std::io::Read;
+        // Capture stdout
+        let mut buf = Vec::new();
+        let stdout = std::io::stdout();
+        let mut handle = stdout.lock();
+        let orig = std::io::set_output_capture(Some(Box::new(Cursor::new(&mut buf))));
+        print_upload_result(200, "OK");
+        std::io::set_output_capture(orig);
+        let output = String::from_utf8_lossy(&buf);
+        assert!(output.contains("Upload successful!"));
+        assert!(output.contains("200 OK"));
+    }
+
+    #[test]
+    fn test_print_upload_result_failure() {
+        use std::io::Cursor;
+        use std::io::Read;
+        let mut buf = Vec::new();
+        let stdout = std::io::stdout();
+        let mut handle = stdout.lock();
+        let orig = std::io::set_output_capture(Some(Box::new(Cursor::new(&mut buf))));
+        print_upload_result(401, "Unauthorized");
+        std::io::set_output_capture(orig);
+        let output = String::from_utf8_lossy(&buf);
+        assert!(!output.contains("Upload successful!"));
+        assert!(output.contains("401 Unauthorized"));
+    }
 }
