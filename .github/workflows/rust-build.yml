@@ -1,4 +1,8 @@
 name: Build and Upload Rust Binary
+
+on:
+  push:
+    branches: [ main ]
 jobs:
   build:
     runs-on: ubuntu-latest
