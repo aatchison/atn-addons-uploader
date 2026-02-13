@@ -1,8 +1,8 @@
 {
 	"image": "mcr.microsoft.com/devcontainers/base:noble",
 	"features": {
-		"ghcr.io/devcontainers/features/rust:1": {},
-		"ghcr.io/devcontainers/features/docker-in-docker:2": {} 
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/roul/devcontainer-features/mise-rust:1": {}
 	},
 	"postCreateCommand": "sudo apt update && sudo apt install -y pkg-config libssl-dev"
 }
