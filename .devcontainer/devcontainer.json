@@ -1,0 +1,7 @@
+{
+	"image": "mcr.microsoft.com/devcontainers/base:noble",
+	"features": {
+		"ghcr.io/devcontainers/features/rust:1": {}
+	},
+	"postCreateCommand": "sudo apt update && sudo apt install -y pkg-config libssl-dev"
+}
