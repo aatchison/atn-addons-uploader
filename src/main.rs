@@ -53,6 +53,7 @@ fn random_jti(len: usize) -> String {
 
 /// Print upload result and success message if appropriate
 fn print_upload_result<W: std::io::Write>(mut w: W, status: u16, body: &str) {
+    #[allow(unused_imports)]
     use std::io::Write;
     writeln!(w, "{} {}", status, body).ok();
     if (200..300).contains(&status) {
