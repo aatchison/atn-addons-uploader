@@ -1,3 +1,73 @@
+    #[test]
+    fn test_missing_args() {
+        use clap::Parser;
+        // Only api_key provided
+        let result = Args::try_parse_from([
+            "bin", "--api-key", "k", "--api-secret", "s", "--addon-guid", "g", "--version", "v"
+        ]);
+        assert!(result.is_ok());
+        let args = result.unwrap();
+        // xpi_path missing
+        assert_eq!(args.xpi_path, None);
+
+        // Only api_secret provided
+        let result2 = Args::try_parse_from([
+            "bin", "--api-secret", "s", "--addon-guid", "g", "--version", "v", "--xpi-path", "p"
+        ]);
+        assert!(result2.is_ok());
+        let args2 = result2.unwrap();
+        // api_key missing
+        assert_eq!(args2.api_key, None);
+
+        // No arguments
+        let result3 = Args::try_parse_from(["bin"]);
+        assert!(result3.is_ok());
+        let args3 = result3.unwrap();
+        assert_eq!(args3.api_key, None);
+        assert_eq!(args3.api_secret, None);
+        assert_eq!(args3.addon_guid, None);
+        assert_eq!(args3.version, None);
+        assert_eq!(args3.xpi_path, None);
+    }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_random_jti_length() {
+        let jti = random_jti(64);
+        assert_eq!(jti.len(), 64);
+        let jti2 = random_jti(10);
+        assert_eq!(jti2.len(), 10);
+    }
+
+    #[test]
+    fn test_claims_fields() {
+        let claims = Claims {
+            iss: "issuer".to_string(),
+            jti: "JTI".to_string(),
+            exp: 123,
+            iat: 100,
+        };
+        assert_eq!(claims.iss, "issuer");
+        assert_eq!(claims.jti, "JTI");
+        assert_eq!(claims.exp, 123);
+        assert_eq!(claims.iat, 100);
+    }
+
+    #[test]
+    fn test_arg_parsing() {
+        use clap::Parser;
+        let args = Args::parse_from([
+            "bin", "--api-key", "k", "--api-secret", "s", "--addon-guid", "g", "--version", "v", "--xpi-path", "p"
+        ]);
+        assert_eq!(args.api_key, Some("k".to_string()));
+        assert_eq!(args.api_secret, Some("s".to_string()));
+        assert_eq!(args.addon_guid, Some("g".to_string()));
+        assert_eq!(args.version, Some("v".to_string()));
+        assert_eq!(args.xpi_path, Some("p".to_string()));
+    }
+}
 use std::path::PathBuf;
 use chrono::{Duration, Utc};
 use rand::{distributions::Uniform, Rng};
@@ -7,7 +77,7 @@ use serde::Serialize;
 use clap::Parser;
 
 #[derive(Parser, Debug)]
-#[command(author, version, about = "Uploads an XPI to addons.thunderbird.net using JWT auth")]
+#[command(author, version, about = "Uploads an XPI to addons.thunderbird.net using JWT auth", disable_version_flag = true)]
 struct Args {
         /// Print verbose debugging output
         #[arg(long)]
