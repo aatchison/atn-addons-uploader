@@ -169,13 +169,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     if args.verbose {
-        println!("[DEBUG] api_key: {}", api_key);
+        // Mask API key and token for debug output
+        let mask = |s: &str| if s.len() > 6 { format!("{}***", &s[..3]) } else { "***".to_string() };
+        println!("[DEBUG] api_key: {}", mask(&api_key));
         println!("[DEBUG] api_secret: {}", "*hidden*");
         println!("[DEBUG] addon_guid: {}", addon_guid);
         println!("[DEBUG] version: {}", version);
         println!("[DEBUG] xpi_path: {}", xpi_path);
-        println!("[DEBUG] JWT claims: {{ iss: {}, jti: {}, exp: {}, iat: {} }}", claims.iss, claims.jti, claims.exp, claims.iat);
-        println!("[DEBUG] JWT token: {}", token);
+        println!("[DEBUG] JWT claims: {{ iss: {}, jti: {}, exp: {}, iat: {} }}", mask(&claims.iss), mask(&claims.jti), claims.exp, claims.iat);
+        println!("[DEBUG] JWT token: {}", mask(&token));
         println!("[DEBUG] Upload URL: {}", url);
     }
 
